@@ -104,7 +104,7 @@ function CreateProjectModal({ onClose, fetchProjects }) {
     } catch (error) {
       const errors = error.response?.data?.error;
       const message = error.response?.data?.message;
-      if (errors && errors.length > 0) {
+      if (Array.isArray(errors) && errors.length > 0) {
         toast.error(errors[0].msg);
       } else if (message) {
         toast.error(message);
