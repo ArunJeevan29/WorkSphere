@@ -74,6 +74,26 @@ const updateProjectValidation = [
   body("status")
     .isIn(["planning", "active", "completed", "archived"])
     .withMessage("Invalid Project Status"),
+  body("icon")
+    .trim()
+    .notEmpty()
+    .withMessage("Icon is required")
+    .isIn([
+      "monitor",
+      "mobile",
+      "shopping",
+      "chart",
+      "dashboard",
+      "code",
+      "design",
+    ])
+    .withMessage("Invalid Icon"),
+  body("color")
+    .trim()
+    .notEmpty()
+    .withMessage("Color is required")
+    .isIn(["red", "green", "blue", "orange", "violet", "slate"])
+    .withMessage("Invalid Color"),
 ];
 
 const addProjectMembersValidation = [
