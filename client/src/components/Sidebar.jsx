@@ -23,23 +23,12 @@ function Sidebar() {
           </NavLink>
         )}
 
-        {["admin", "manager"].includes(user.role) && (
-          <NavLink
-            to="/tasks"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 text-sm font-medium text-left transition cursor-pointer"
-          >
-            Tasks
-          </NavLink>
-        )}
-
-        {["member"].includes(user.role) && (
-          <NavLink
-            to="/my-tasks"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 text-sm font-medium text-left transition cursor-pointer"
-          >
-            My Tasks
-          </NavLink>
-        )}
+        <NavLink
+          to="/tasks"
+          className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 text-sm font-medium text-left transition cursor-pointer"
+        >
+          Tasks
+        </NavLink>
 
         {["admin"].includes(user.role) && (
           <NavLink

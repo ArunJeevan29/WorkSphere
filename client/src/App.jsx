@@ -8,11 +8,11 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
-import ProjectDetails from "./pages/ProjectDetails";
 import Tasks from "./pages/Tasks";
 import Users from "./pages/Users";
 import AuditLogs from "./pages/AuditLogs";
-import MyTasks from "./pages/MyTasks";
+
+import ProjectDetails from "./pages/ProjectDetails";
 
 function App() {
   return (
@@ -75,11 +75,9 @@ function App() {
             path="/tasks"
             element={
               <ProtectedRoutes>
-                <RoleProtectedRoute allowedRoles={["manager", "admin"]}>
-                  <AppLayout>
-                    <Tasks />
-                  </AppLayout>
-                </RoleProtectedRoute>
+                <AppLayout>
+                  <Tasks />
+                </AppLayout>
               </ProtectedRoutes>
             }
           />
@@ -102,18 +100,6 @@ function App() {
                 <RoleProtectedRoute allowedRoles={["admin"]}>
                   <AppLayout>
                     <AuditLogs />
-                  </AppLayout>
-                </RoleProtectedRoute>
-              </ProtectedRoutes>
-            }
-          />
-          <Route
-            path="/my-tasks"
-            element={
-              <ProtectedRoutes>
-                <RoleProtectedRoute allowedRoles={["member"]}>
-                  <AppLayout>
-                    <MyTasks />
                   </AppLayout>
                 </RoleProtectedRoute>
               </ProtectedRoutes>

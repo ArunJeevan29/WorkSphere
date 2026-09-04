@@ -13,22 +13,20 @@ const {
 } = require("../middleware/validationMiddleware");
 
 const {
+  getTasks,
   getTask,
   updateTask,
   deleteTask,
-  getAllTask,
   updateTaskStatus,
   // getAllTasks,
 } = require("../controllers/taskController");
 
 router.get(
-  "/my-tasks",
+  "/",
   authMiddleware,
   authorizationMiddleware(["admin", "manager", "member"]),
-  getAllTask,
+  getTasks,
 );
-
-// router.get("/", getAllTasks);
 
 router.get(
   "/:id",
@@ -59,7 +57,7 @@ router.delete(
 router.patch(
   "/:id/status",
   authMiddleware,
-  authorizationMiddleware(["member"]),
+  authorizationMiddleware(["admin", "manager", "member"]),
   taskAccessMiddleware,
   updateTaskStatusValidation,
   validate,

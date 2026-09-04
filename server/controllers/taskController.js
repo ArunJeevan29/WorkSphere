@@ -3,14 +3,84 @@ const Task = require("../models/Task");
 
 const createAuditLog = require("../utils/createAuditLog");
 
-// const getAllTasks = async (req, res, next) => {
-//   try {
-//     const tasks = await Task.find();
-//     return res.status(200).json({ tasks });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+const getTasks = async (req, res, next) => {
+  try {
+    const { id, role } = req.user;
+    const {
+      search,
+      status,
+      priority,
+      sortBy,
+      page = 1,
+      limit = 15,
+    } = req.query;
+    const query = {};
+    if (role === "admin") {
+    } else if (role === "manager") {
+      const projects = await Project.find({ createdBy: id });
+      const projectIds = projects.map((project) => project._id);
+      query.project = {
+        $in: projectIds,
+      };
+    } else if (role === "member") {
+      query.assignedTo = id;
+    }
+
+    if (status) {
+      query.status = status;
+    }
+    if (priority) {
+      query.priority = priority;
+    }
+    if (search) {
+      const projects = await Project.find({
+        name: {
+          $regex: search,
+          $options: "i",
+        },
+      }).select("_id");
+      const projectIds = projects.map((project) => project._id);
+
+      query.$or = [
+        {
+          title: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+        {
+          description: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+        {
+          project: { $in: projectIds },
+        },
+      ];
+    }
+    let sortOptions = { createdAt: -1 };
+    if (sortBy === "oldest") {
+      sortOptions = { createdAt: 1 };
+    }
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const tasks = await Task.find(query)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limitNumber)
+      .populate("project", "name")
+      .populate("assignedTo", "name");
+
+    const filteredTotalTasks = await Task.countDocuments(query);
+    const totalPages = Math.ceil(filteredTotalTasks / limitNumber);
+    return res.status(200).json({ tasks, totalPages });
+  } catch (error) {
+    next(error);
+  }
+};
 
 const getTask = async (req, res, next) => {
   try {
@@ -50,6 +120,7 @@ const updateTask = async (req, res, next) => {
       action: "TASK_UPDATED",
       resource: "Task",
       resourceId: task._id,
+
       metadata: {
         title: task.title,
       },
@@ -72,6 +143,7 @@ const deleteTask = async (req, res, next) => {
       action: "TASK_DELETED",
       resource: "Task",
       resourceId: task._id,
+
       metadata: {
         title: task.title,
         project: task.project,
@@ -80,16 +152,6 @@ const deleteTask = async (req, res, next) => {
     });
 
     return res.status(200).json({ message: "Task deleted Successfully", task });
-  } catch (error) {
-    next(error);
-  }
-};
-
-const getAllTask = async (req, res, next) => {
-  try {
-    const { id } = req.user;
-    const tasks = await Task.find({ assignedTo: id });
-    return res.status(200).json(tasks);
   } catch (error) {
     next(error);
   }
@@ -106,13 +168,13 @@ const updateTaskStatus = async (req, res, next) => {
       action: "TASK_STATUS_UPDATED",
       resource: "Task",
       resourceId: task._id,
+
       metadata: {
         title: task.title,
         status: task.status,
       },
       ipAddress: req.ip,
     });
-
     return res.status(200).json({ message: "Updated Task Status", task });
   } catch (error) {
     next(error);
@@ -120,10 +182,9 @@ const updateTaskStatus = async (req, res, next) => {
 };
 
 module.exports = {
+  getTasks,
   getTask,
   updateTask,
   deleteTask,
-  getAllTask,
   updateTaskStatus,
-  // getAllTasks,
 };
