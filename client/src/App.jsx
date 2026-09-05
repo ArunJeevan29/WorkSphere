@@ -13,6 +13,7 @@ import Users from "./pages/Users";
 import AuditLogs from "./pages/AuditLogs";
 
 import ProjectDetails from "./pages/ProjectDetails";
+import ProjectOverview from "./pages/ProjectOverview";
 
 function App() {
   return (
@@ -70,7 +71,9 @@ function App() {
                 </RoleProtectedRoute>
               </ProtectedRoutes>
             }
-          />
+          >
+            <Route index element={<ProjectOverview />} />
+          </Route>
           <Route
             path="/tasks"
             element={
