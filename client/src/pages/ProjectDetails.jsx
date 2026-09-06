@@ -135,6 +135,18 @@ function ProjectDetails() {
             Overview
           </button>
 
+          {/* Tasks */}
+          <button
+            onClick={() => navigate(`/projects/${id}/tasks`)}
+            className={`px-4 py-3 text-sm font-medium cursor-pointer ${
+              location.pathname === `/projects/${id}/tasks`
+                ? "text-violet-600 border-b-2 border-violet-600"
+                : "text-slate-500 hover:text-slate-900"
+            }`}
+          >
+            Tasks ({recentTasks.length})
+          </button>
+
 
         </div>
       </div>

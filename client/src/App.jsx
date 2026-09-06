@@ -14,6 +14,7 @@ import AuditLogs from "./pages/AuditLogs";
 
 import ProjectDetails from "./pages/ProjectDetails";
 import ProjectOverview from "./pages/ProjectOverview";
+import ProjectTasks from "./pages/ProjectTasks";
 
 function App() {
   return (
@@ -73,6 +74,7 @@ function App() {
             }
           >
             <Route index element={<ProjectOverview />} />
+            <Route path="tasks" element={<ProjectTasks />} />
           </Route>
           <Route
             path="/tasks"
