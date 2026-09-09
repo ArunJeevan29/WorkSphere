@@ -27,7 +27,7 @@ const taskAccessMiddleware = async (req, res, next) => {
         (member) => member.toString() === req.user.id.toString(),
       );
       if (isAssigned) {
-        return next();  
+        return next();
       }
     }
     return res.status(403).json({ message: "Invalid Access" });
