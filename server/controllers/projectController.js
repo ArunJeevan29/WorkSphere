@@ -1,6 +1,8 @@
+const mongoose = require("mongoose");
 const Project = require("../models/Project");
 const User = require("../models/User");
 const Task = require("../models/Task");
+const AuditLog = require("../models/AuditLog");
 const createAuditLog = require("../utils/createAuditLog");
 
 const createProject = async (req, res, next) => {
@@ -20,6 +22,7 @@ const createProject = async (req, res, next) => {
       action: "PROJECT_CREATED",
       resource: "Project",
       resourceId: project._id,
+      project: project._id,
       metadata: {
         name: project.name,
       },
@@ -74,7 +77,6 @@ const getProject = async (req, res, next) => {
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
-    console.log(project);
     return res.status(200).json(project);
   } catch (error) {
     next(error);
@@ -84,10 +86,10 @@ const getProject = async (req, res, next) => {
 const updateProject = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, description, status } = req.body;
+    const { name, description, status, icon, color } = req.body;
     const project = await Project.findByIdAndUpdate(
       id,
-      { name, description, status },
+      { name, description, status, icon, color },
       { new: true },
     );
     if (!project) {
@@ -98,6 +100,7 @@ const updateProject = async (req, res, next) => {
       action: "PROJECT_EDITED",
       resource: "Project",
       resourceId: project._id,
+      project: project._id,
       metadata: {
         name: project.name,
         status: project.status,
@@ -115,10 +118,14 @@ const updateProject = async (req, res, next) => {
 const deleteProject = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const project = await Project.findByIdAndDelete(id);
+    const project = await Project.findById(id);
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
+    await Task.deleteMany({ project: id });
+
+    await AuditLog.deleteMany({ project: id });
+
     await createAuditLog({
       actor: req.user.id,
       action: "PROJECT_DELETED",
@@ -129,7 +136,26 @@ const deleteProject = async (req, res, next) => {
       },
       ipAddress: req.ip,
     });
+
+    await Project.findByIdAndDelete(id);
+
     return res.status(200).json({ message: "Project deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getAvailableProjectMembers = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const project = await Project.findById(id);
+    const users = await User.find({
+      _id: { $nin: project.members },
+      role: "member",
+      status: "active",
+    }).select("-password");
+    console.log(users);
+    return res.status(200).json({ users });
   } catch (error) {
     next(error);
   }
@@ -140,9 +166,6 @@ const addProjectMember = async (req, res, next) => {
     const { id } = req.params;
     const { members } = req.body;
     const project = await Project.findById(id);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found" });
-    }
     const users = await User.find({ _id: { $in: members } });
     if (users.length !== members.length) {
       return res.status(404).json({ message: "One or more users not found" });
@@ -160,6 +183,7 @@ const addProjectMember = async (req, res, next) => {
       action: "PROJECT_MEMBERS_ADDED",
       resource: "Project",
       resourceId: project._id,
+      project: project._id,
       metadata: {
         addedMembers: newMembers,
       },
@@ -199,6 +223,7 @@ const removeProjectMembers = async (req, res, next) => {
       action: "PROJECT_MEMBERS_REMOVED",
       resource: "Project",
       resourceId: project._id,
+      project: project._id,
       metadata: {
         removedMembers: members,
       },
@@ -242,9 +267,9 @@ const createTask = async (req, res, next) => {
       action: "TASK_CREATED",
       resource: "Task",
       resourceId: task._id,
+      project: projectId,
       metadata: {
         title: task.title,
-        project: task.project,
       },
       ipAddress: req.ip,
     });
@@ -257,16 +282,106 @@ const createTask = async (req, res, next) => {
 const fetchAllTask = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const tasks = await Task.find({ project: id });
-    const completedTasks = tasks.filter(
-      (task) => task.status === "completed",
-    ).length;
+    const { status, priority, search, sort, page = 1, limit = 5 } = req.query;
+    const query = {
+      project: id,
+    };
+    if (status) {
+      query.status = status;
+    }
+    if (priority) {
+      query.priority = priority;
+    }
+    if (search) {
+      query.$or = [
+        {
+          title: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+        {
+          description: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+      ];
+    }
+    let sortOption = { createdAt: -1 };
+    if (sort === "oldest") {
+      sortOption = { createdAt: 1 };
+    }
+    if (sort === "due-asc") {
+      sortOption = { dueDate: 1 };
+    }
+
+    if (sort === "due-desc") {
+      sortOption = { dueDate: -1 };
+    }
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const tasks = await Task.find(query)
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limitNumber)
+      .populate("assignedTo", "name email role");
+
+    const filteredTotalTasks = await Task.countDocuments(query);
+    const projectTotalTasks = await Task.countDocuments({ project: id });
+    const totalPages = Math.ceil(filteredTotalTasks / limitNumber);
+
+    const projectId = new mongoose.Types.ObjectId(id);
+
+    const stats = await Task.aggregate([
+      {
+        $match: {
+          project: projectId,
+        },
+      },
+      {
+        $group: {
+          _id: "$status",
+          count: {
+            $sum: 1,
+          },
+        },
+      },
+    ]);
+
+    let completedTasks = 0;
+    let pendingTask = 0;
+    let inProgressTask = 0;
+    stats.forEach((stat) => {
+      if (stat._id === "completed") {
+        completedTasks = stat.count;
+      }
+      if (stat._id === "pending") {
+        pendingTask = stat.count;
+      }
+      if (stat._id === "in-progress") {
+        inProgressTask = stat.count;
+      }
+    });
+
     const progress =
-      tasks.length === 0 ? 0 : (completedTasks / tasks.length) * 100;
-    console.log(tasks);
-    return res
-      .status(200)
-      .json({ tasks, totalTasks: tasks.length, completedTasks, progress });
+      projectTotalTasks === 0 ? 0 : (completedTasks / projectTotalTasks) * 100;
+
+    return res.status(200).json({
+      tasks,
+      totalTasks: projectTotalTasks,
+      filteredTotalTasks,
+      totalPages,
+      currentPage: pageNumber,
+      limit: limitNumber,
+
+      completedTasks,
+      progress,
+      pendingTask,
+      inProgressTask,
+    });
   } catch (error) {
     next(error);
   }
@@ -277,6 +392,7 @@ module.exports = {
   getProjects,
   getProject,
   updateProject,
+  getAvailableProjectMembers,
   addProjectMember,
   removeProjectMembers,
   deleteProject,

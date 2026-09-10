@@ -38,4 +38,13 @@ export const fetchAllTask = (id, filters = {}) => {
 export const createTask = (id, task) =>
   api.post(`/api/projects/${id}/tasks`, task);
 
+export const getAvailableProjectMembers = (id) =>
+  api.get(`/api/projects/${id}/available-members`);
+
+export const addProjectMember = (id, members) =>
+  api.patch(`/api/projects/${id}/members`, { members });
+
+export const removeProjectMembers = (id, memberId) =>
+  api.delete(`/api/projects/${id}/members`, { data: { members: [memberId] } });
+
 

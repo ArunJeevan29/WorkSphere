@@ -19,6 +19,7 @@ const {
   getProject,
   updateProject,
   deleteProject,
+  getAvailableProjectMembers,
   addProjectMember,
   removeProjectMembers,
   createTask,
@@ -69,6 +70,14 @@ router.delete(
 );
 
 // Project members
+// fetch available users
+router.get(
+  "/:id/available-members",
+  authMiddleware,
+  authorizationMiddleware(["admin", "manager"]),
+  projectOwnershipMiddleware,
+  getAvailableProjectMembers,
+);
 // add project members
 router.patch(
   "/:id/members",
