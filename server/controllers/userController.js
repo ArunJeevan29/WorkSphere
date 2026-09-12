@@ -3,8 +3,43 @@ const createAuditLog = require("../utils/createAuditLog");
 
 const getAllUsers = async (req, res, next) => {
   try {
-    const users = await User.find().select("-password");
-    return res.status(200).json({ users });
+    const { search, role, status, page = 1, limit = 15 } = req.query;
+    const query = {
+      role: { $ne: "admin" },
+    };
+    if (role && role !== "admin") {
+      query.role = role;
+    }
+    if (status) {
+      query.status = status;
+    }
+    if (search) {
+      query.$or = [
+        {
+          name: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+        {
+          email: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+      ];
+    }
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const users = await User.find(query)
+      .skip(skip)
+      .limit(limitNumber)
+      .select("-password");
+    const filteredtotalUsers = await User.countDocuments(query);
+    const totalPages = Math.ceil(filteredtotalUsers / limitNumber);
+    return res.status(200).json({ users, totalPages });
   } catch (error) {
     next(error);
   }
