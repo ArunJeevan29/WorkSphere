@@ -11,10 +11,11 @@ const {
 
 router.get("/", authMiddleware, authorizationMiddleware(["admin"]), getAllLogs);
 
-(router.get(
+router.get(
   "/:id",
   authMiddleware,
   authorizationMiddleware(["admin", "manager"]),
   getAuditLogs,
 ),
-  (module.exports = router));
+
+module.exports = router;

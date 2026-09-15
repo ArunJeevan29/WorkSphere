@@ -19,6 +19,10 @@ const auditLogSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       required: true,
     },
+    project: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project",
+    },
     metadata: {
       type: mongoose.Schema.Types.Mixed,
       default: {},
@@ -32,6 +36,8 @@ const auditLogSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+auditLogSchema.index({ project: 1, createdAt: -1 });
 
 const AuditLog = mongoose.model("AuditLog", auditLogSchema);
 module.exports = AuditLog;

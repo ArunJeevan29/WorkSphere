@@ -5,6 +5,7 @@ const createAuditLog = async ({
   action,
   resource,
   resourceId,
+  project,
   metadata,
   ipAddress,
 }) => {
@@ -13,6 +14,7 @@ const createAuditLog = async ({
     action,
     resource,
     resourceId,
+    project,
     metadata,
     ipAddress,
   });

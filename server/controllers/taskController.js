@@ -120,7 +120,7 @@ const updateTask = async (req, res, next) => {
       action: "TASK_UPDATED",
       resource: "Task",
       resourceId: task._id,
-
+      project: task.project,
       metadata: {
         title: task.title,
       },
@@ -143,7 +143,7 @@ const deleteTask = async (req, res, next) => {
       action: "TASK_DELETED",
       resource: "Task",
       resourceId: task._id,
-
+      project: task.project,
       metadata: {
         title: task.title,
         project: task.project,
@@ -168,7 +168,7 @@ const updateTaskStatus = async (req, res, next) => {
       action: "TASK_STATUS_UPDATED",
       resource: "Task",
       resourceId: task._id,
-
+      project: task.project,
       metadata: {
         title: task.title,
         status: task.status,
