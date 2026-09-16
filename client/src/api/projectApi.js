@@ -47,4 +47,19 @@ export const addProjectMember = (id, members) =>
 export const removeProjectMembers = (id, memberId) =>
   api.delete(`/api/projects/${id}/members`, { data: { members: [memberId] } });
 
-
+export const getAuditLogs = (id, filters = {}) => {
+  const params = new URLSearchParams();
+  if (filters.search) {
+    params.append("search", filters.search);
+  }
+  if (filters.action) {
+    params.append("action", filters.action);
+  }
+  if (filters.page) {
+    params.append("page", filters.page);
+  }
+  if (filters.limit) {
+    params.append("limit", filters.limit);
+  }
+  return api.get(`/api/auditlogs/${id}?${params.toString()}`);
+};
