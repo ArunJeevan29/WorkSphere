@@ -1,19 +1,19 @@
 export function getActivityMessage(log) {
   switch (log.action) {
-    case "TASK_CREATED":
-      return "created a new task";
+      case "TASK_CREATED":
+        return "created a new task";
 
-    case "TASK_UPDATED":
-      return "updated a task";
+      case "TASK_UPDATED":
+        return "updated a task";
 
-    case "TASK_DELETED":
-      return "deleted a task";
+      case "TASK_DELETED":
+        return "deleted a task";
 
-    case "TASK_STATUS_UPDATED":
-      return "updated a task status";
+      case "TASK_STATUS_UPDATED":
+        return "updated a task status";
 
     case "PROJECT_CREATED":
-      return "created the project";
+      return "created a new project";
 
     case "PROJECT_EDITED":
       return "edited a project";

@@ -6,7 +6,7 @@ import AppLayout from "./components/AppLayout";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
+import DashboardPage from "./pages/Dashboard/DashboardPage";
 import Projects from "./pages/Projects";
 import Tasks from "./pages/Tasks";
 import Users from "./pages/Users";
@@ -45,7 +45,7 @@ function App() {
                   allowedRoles={["member", "manager", "admin"]}
                 >
                   <AppLayout>
-                    <Dashboard />
+                    <DashboardPage />
                   </AppLayout>
                 </RoleProtectedRoute>
               </ProtectedRoutes>
