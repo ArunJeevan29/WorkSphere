@@ -5,6 +5,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 const authorizationMiddleware = require("../middleware/authorizationMiddleware");
 const {
   fetchAdminDashboardAnalytics,
+  fetchManagerDashboardAnalytics,
 
 } = require("../controllers/dashboardController");
 router.get(
@@ -13,6 +14,14 @@ router.get(
   authorizationMiddleware(["admin"]),
   fetchAdminDashboardAnalytics,
 );
+
+router.get(
+  "/manager",
+  authMiddleware,
+  authorizationMiddleware(["manager"]),
+  fetchManagerDashboardAnalytics,
+);
+
 
 
 module.exports = router;
