@@ -245,10 +245,75 @@ const fetchManagerDashboardAnalytics = async (req, res, next) => {
   }
 };
 
+const fetchMemberDashboardAnalytics = async (req, res, next) => {
+  try {
+    const { id } = req.user;
+    const taskStats = await Task.aggregate([
+      {
+        $match: {
+          assignedTo: id,
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalTasks: { $sum: 1 },
+          pendingTasks: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "pending"] }, 1, 0],
+            },
+          },
+          inProgressTasks: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "in-progress"] }, 1, 0],
+            },
+          },
+          completedTasks: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "completed"] }, 1, 0],
+            },
+          },
+        },
+      },
+    ]);
+    const taskData = taskStats[0] || {
+      totalTasks: 0,
+      pendingTasks: 0,
+      inProgressTasks: 0,
+      completedTasks: 0,
+    };
+    const completionRate =
+      taskData.totalTasks === 0
+        ? 0
+        : (taskData.completedTasks / taskData.totalTasks) * 100;
 
+    const upcomingTasks = await Task.find({
+      assignedTo: id,
+      dueDate: { $gte: new Date() },
+      status: { $ne: "completed" },
+    })
+      .populate("project", "name")
+      .sort({ dueDate: 1 })
+      .limit(3);
+
+    const recentActivity = await AuditLog.find({ actor: id })
+      .populate("project", "name")
+      .sort({ createdAt: -1 })
+      .limit(4);
+
+    return res.status(200).json({
+      taskStats: taskData,
+      completionRate,
+      upcomingTasks,
+      recentActivity,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   fetchAdminDashboardAnalytics,
   fetchManagerDashboardAnalytics,
-
+  fetchMemberDashboardAnalytics,
 };

@@ -1,7 +1,7 @@
 import { useAuth } from "../../context/authContext";
 import AdminDashboard from "./AdminDashboard";
 import ManagerDashboard from "./ManagerDashboard";
-
+import MemberDashboard from "./MemberDashboard";
 
 function DashboardPage() {
   const { user } = useAuth();
@@ -11,7 +11,7 @@ function DashboardPage() {
   if (user?.role === "manager") {
     return <ManagerDashboard />;
   }
-  return <div>Welcome, {user?.name}</div>;
+  return <MemberDashboard />;
 }
 
 export default DashboardPage;
