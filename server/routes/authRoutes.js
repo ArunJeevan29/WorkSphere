@@ -17,7 +17,9 @@ const authMiddleware = require("../middleware/authMiddleware");
 const {
   registerUser,
   loginUser,
+  refreshAccessToken,
   getCurrentUser,
+  logoutUser,
 } = require("../controllers/authController");
 
 router.post("/login", loginLimit, loginValidation, validate, loginUser);
@@ -29,6 +31,10 @@ router.post(
   validate,
   registerUser,
 );
+
+router.post("/refresh", refreshAccessToken);
+
+router.post("/logout", logoutUser);
 
 router.get("/me", authMiddleware, getCurrentUser);
 

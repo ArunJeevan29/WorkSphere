@@ -39,7 +39,12 @@ const createProject = async (req, res, next) => {
 
 const getProjects = async (req, res, next) => {
   try {
-    const fetchProjects = await Project.find().populate(
+    const { id, role } = req.user;
+    const query = {};
+    if (role === "manager") {
+      query.createdBy = id;
+    }
+    const fetchProjects = await Project.find(query).populate(
       "createdBy",
       "name email",
     );

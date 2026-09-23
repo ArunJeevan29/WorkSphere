@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
-import { getCurrentUser } from "../api/authApi";
+import { getCurrentUser, logoutUser } from "../api/authApi";
 
 const AuthContext = createContext();
 
@@ -9,8 +9,8 @@ function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   const fetchCurrentUser = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) {
       setUser(null);
       setLoading(false);
       return;
@@ -19,7 +19,7 @@ function AuthProvider({ children }) {
       const response = await getCurrentUser();
       setUser(response.data.user);
     } catch (error) {
-      localStorage.removeItem("token");
+      localStorage.removeItem("accessToken");
       setUser(null);
     } finally {
       setLoading(false);
@@ -30,9 +30,16 @@ function AuthProvider({ children }) {
     fetchCurrentUser();
   }, []);
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
+  const logout = async () => {
+    try {
+      await logoutUser();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("user");
+      setUser(null);
+    }
   };
 
   return (

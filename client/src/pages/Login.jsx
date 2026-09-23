@@ -30,7 +30,7 @@ function Login() {
 
       toast.success(response.data.message);
 
-      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("accessToken", response.data.accessToken);
       localStorage.setItem("user", JSON.stringify(response.data.user));
 
       await fetchCurrentUser();
