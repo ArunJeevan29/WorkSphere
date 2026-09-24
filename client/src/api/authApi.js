@@ -1,4 +1,4 @@
-import api from "../api/axios";
+﻿import api from "../api/axios";
 
 export const registerUser = (user) => api.post("/api/auth/register", user);
 
@@ -9,3 +9,9 @@ export const refreshAccessToken = () => api.post("/api/auth/refresh");
 export const getCurrentUser = () => api.get("/api/auth/me");
 
 export const logoutUser = () => api.post("/api/auth/logout");
+
+export const forgotPassword = (email) =>
+  api.post("/api/auth/forgot-password", email);
+
+export const resetPassword = (token, passwords) =>
+  api.post(`/api/auth/reset-password/${token}`, passwords);
