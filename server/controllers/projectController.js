@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+﻿const mongoose = require("mongoose");
 const Project = require("../models/Project");
 const User = require("../models/User");
 const Task = require("../models/Task");
@@ -82,7 +82,8 @@ const getProject = async (req, res, next) => {
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
-    return res.status(200).json(project);
+    const tasks = await Task.countDocuments({ project: id });
+    return res.status(200).json({ project, tasks });
   } catch (error) {
     next(error);
   }
@@ -159,7 +160,6 @@ const getAvailableProjectMembers = async (req, res, next) => {
       role: "member",
       status: "active",
     }).select("-password");
-    console.log(users);
     return res.status(200).json({ users });
   } catch (error) {
     next(error);
@@ -171,24 +171,48 @@ const addProjectMember = async (req, res, next) => {
     const { id } = req.params;
     const { members } = req.body;
     const project = await Project.findById(id);
-    const users = await User.find({ _id: { $in: members } });
+    const users = await User.find({
+      _id: { $in: members },
+      role: "member",
+      status: "active",
+    });
+
     if (users.length !== members.length) {
       return res.status(404).json({ message: "One or more users not found" });
     }
-    const newMembers = members.filter((userId) => {
-      return !project.members.some(
-        (member) => member.toString() === userId.toString(),
-      );
-    });
-    project.members.push(...newMembers);
-    await project.save();
+
+    const existingMemberIds = project.members.map((member) =>
+      member.toString(),
+    );
+
+    const newMembers = members.filter(
+      (userId) => !existingMemberIds.includes(userId.toString()),
+    );
+
+    if (newMembers.length === 0) {
+      return res.status(400).json({
+        message: "All selected users are already project members",
+      });
+    }
+
+    const updatedProject = await Project.findByIdAndUpdate(
+      id,
+      {
+        $addToSet: {
+          members: {
+            $each: newMembers,
+          },
+        },
+      },
+      { new: true },
+    ).populate("members", "name email role");
 
     await createAuditLog({
       actor: req.user.id,
       action: "PROJECT_MEMBERS_ADDED",
       resource: "Project",
-      resourceId: project._id,
-      project: project._id,
+      resourceId: updatedProject._id,
+      project: updatedProject._id,
       metadata: {
         addedMembers: newMembers,
       },
@@ -197,7 +221,7 @@ const addProjectMember = async (req, res, next) => {
     await project.populate("members", "name email role");
     return res
       .status(200)
-      .json({ message: "Members added successfully", project });
+      .json({ message: "Members added successfully", project: updatedProject });
   } catch (error) {
     next(error);
   }
@@ -373,7 +397,6 @@ const fetchAllTask = async (req, res, next) => {
 
     const progress =
       projectTotalTasks === 0 ? 0 : (completedTasks / projectTotalTasks) * 100;
-
     return res.status(200).json({
       tasks,
       totalTasks: projectTotalTasks,

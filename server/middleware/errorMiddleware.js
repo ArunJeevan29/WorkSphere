@@ -1,9 +1,12 @@
 const errorMiddleware = (err, req, res, next) => {
   console.log(err);
   const statusCode = err.statusCode || 500;
-  return res
-    .status(statusCode)
-    .json({ message: err.message || "Internal Server Error" });
+  return res.status(statusCode).json({
+    message:
+      process.env.NODE_ENV === "production"
+        ? "Internal Server Error"
+        : err.message || "Internal Server Error",
+  });
 };
 
 module.exports = errorMiddleware;

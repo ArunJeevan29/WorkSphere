@@ -26,8 +26,8 @@ function ProjectDetails() {
   async function fetchProject() {
     try {
       const response1 = await getproject(id);
-      setProject(response1.data);
-      setMembers(response1.data.members);
+      setProject(response1.data.project);
+      setMembers(response1.data.project.members);
       const response2 = await fetchAllTask(id);
       setRecentTasks(response2.data.tasks);
       setCompletedTasks(response2.data.completedTasks);
@@ -144,7 +144,7 @@ function ProjectDetails() {
                 : "text-slate-500 hover:text-slate-900"
             }`}
           >
-            Tasks ({recentTasks.length})
+            Tasks ({totalTasks})
           </button>
 
           {/* Members */}

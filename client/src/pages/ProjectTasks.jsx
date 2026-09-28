@@ -8,6 +8,7 @@ import {
   CheckSquare,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
 import { fetchAllTask } from "../api/projectApi";
 import { useParams, useOutletContext } from "react-router-dom";
 import CreateTaskModal from "../components/tasks/CreateTaskModal";
@@ -37,7 +38,7 @@ function ProjectTasks() {
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [limit] = useState(5);
+  const [limit] = useState(10);
 
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("en-GB", {
@@ -64,7 +65,15 @@ function ProjectTasks() {
       setPendingTask(response.data.pendingTask);
       setInProgressTask(response.data.inProgressTask);
     } catch (error) {
-      console.log(error);
+      const errors = error.response?.data?.error;
+      const message = error.response?.data?.message;
+      if (errors && errors.length > 0) {
+        toast.error(errors[0].msg);
+      } else if (message) {
+        toast.error(message);
+      } else {
+        toast.error(error.message);
+      }
     } finally {
       setLoading(false);
     }

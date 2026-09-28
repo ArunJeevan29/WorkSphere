@@ -1,4 +1,4 @@
-import {
+﻿import {
   Monitor,
   Smartphone,
   ShoppingCart,
@@ -45,7 +45,7 @@ const progressStyles = {
 const statusStyles = {
   planning: "bg-yellow-50 text-yellow-600",
   active: "bg-emerald-50 text-emerald-600",
-  completed: "bg-blue-50 text-blue-600",
+  completed: "bg-red-50 text-red-600",
   archived: "bg-slate-100 text-slate-500",
 };
 
@@ -54,43 +54,43 @@ const ProjectCard = ({ project }) => {
   const Icon = iconMap[project.icon];
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-      {/* Top Section */}
+    <div className="flex h-full min-h-[330px] flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
 
-      <div className="flex items-start gap-3">
+      {/* Top Section */}
+      <div className="flex h-[76px] items-start gap-3">
         <div
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${colorStyles[project.color]}`}
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
+            colorStyles[project.color]
+          }`}
         >
           <Icon size={21} />
         </div>
 
-        <div>
-          <h3 className="text-sm font-semibold text-slate-800">
+        <div className="min-w-0 flex-1">
+          <h3 className="line-clamp-2 text-sm font-semibold leading-5 text-slate-800">
             {project.name}
           </h3>
 
-          <p className="mt-1 line-clamp-2 text-xs text-slate-500">
+          <p className="mt-1 line-clamp-2 text-xs leading-4 text-slate-500">
             {project.description}
           </p>
         </div>
       </div>
 
       {/* Status */}
-
-      <div className="mt-4 flex items-center justify-between">
+      <div className="mt-4 flex h-6 items-center">
         <span
           className={`rounded-full px-2.5 py-1 text-[10px] font-medium ${
             statusStyles[project.status]
           }`}
         >
-          {project.status}
+          {project.status[0].toUpperCase() + project.status.slice(1)}
         </span>
       </div>
 
       {/* Progress */}
-
       <div className="mt-3">
-        <div className="flex items-center justify-between">
+        <div className="flex h-5 items-center justify-between">
           <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-100">
             <div
               className={`h-full rounded-full ${progressStyles[project.color]}`}
@@ -100,19 +100,19 @@ const ProjectCard = ({ project }) => {
             />
           </div>
 
-          <span className="ml-3 text-xs text-slate-500">
+          <span className="ml-3 w-8 text-right text-xs text-slate-500">
             {project.progress.toFixed(0)}%
           </span>
         </div>
       </div>
 
       {/* Project Details */}
+      <div className="mt-5 flex-1 space-y-2.5 text-xs text-slate-500">
 
-      <div className="mt-5 space-y-2.5 text-xs text-slate-500">
         <div className="flex items-center gap-2">
-          <CalendarDays size={13} />
+          <CalendarDays className="shrink-0" size={13} />
 
-          <span>
+          <span className="truncate">
             Created:{" "}
             {new Date(project.createdAt).toLocaleDateString("en-GB", {
               day: "2-digit",
@@ -123,19 +123,21 @@ const ProjectCard = ({ project }) => {
         </div>
 
         <div className="flex items-center gap-2">
-          <User size={13} />
+          <User className="shrink-0" size={13} />
 
-          <span>Created by: {project.createdBy.name.toUpperCase()}</span>
+          <span className="truncate">
+            Created by: {project.createdBy.name.toUpperCase()}
+          </span>
         </div>
 
         <div className="flex items-center gap-2">
-          <Users size={13} />
+          <Users className="shrink-0" size={13} />
 
           <span>Members: {project.memberCount}</span>
         </div>
 
         <div className="flex items-center gap-2">
-          <ClipboardList size={13} />
+          <ClipboardList className="shrink-0" size={13} />
 
           <span>
             Tasks: {project.completedTasks} / {project.totalTasks}
@@ -144,9 +146,8 @@ const ProjectCard = ({ project }) => {
       </div>
 
       {/* View Details */}
-
       <button
-        className="mt-5 flex items-center gap-2 text-xs font-medium text-violet-600 transition hover:text-violet-800"
+        className=" flex items-center gap-2 text-xs font-medium text-violet-600 transition hover:text-violet-800"
         onClick={() => navigate(`/projects/${project._id}`)}
       >
         View Details

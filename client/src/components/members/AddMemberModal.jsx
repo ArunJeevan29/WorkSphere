@@ -7,6 +7,7 @@ import {
 import { toast } from "react-hot-toast";
 
 function AddMemberModal({ id, fetchProject, onClose }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [availableUsers, setAvailableUsers] = useState([]);
   const [members, setMembers] = useState([]);
   async function fetchAvailableUsers() {
@@ -24,11 +25,15 @@ function AddMemberModal({ id, fetchProject, onClose }) {
 
   async function handleAddMembers(e) {
     e.preventDefault();
+    if (isSubmitting || members.length === 0) {
+      return;
+    }
+    setIsSubmitting(true);
     try {
       const response = await addProjectMember(id, members);
       toast.success(response.data.message);
-      await fetchProject();
       onClose();
+      fetchProject();
     } catch (error) {
       const errors = error.response?.data?.error;
       const message = error.response?.data?.message;
@@ -120,9 +125,14 @@ function AddMemberModal({ id, fetchProject, onClose }) {
 
             <button
               type="submit"
-              className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-violet-700 cursor-pointer"
+              disabled={isSubmitting || members.length === 0}
+              className={`rounded-lg px-4 py-2 text-sm font-medium text-white shadow-sm transition ${
+                isSubmitting || members.length === 0
+                  ? "cursor-not-allowed bg-violet-300"
+                  : "cursor-pointer bg-violet-600 hover:bg-violet-700"
+              }`}
             >
-              Add Members
+              {isSubmitting ? "Adding..." : "Add Members"}
             </button>
           </div>
         </form>

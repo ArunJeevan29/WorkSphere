@@ -1,4 +1,4 @@
-import {
+﻿import {
   FolderKanban,
   CheckSquare,
   Clock3,
@@ -123,7 +123,7 @@ function ManagerDashboard() {
             <TrendingUp size={14} className="text-emerald-500" />
 
             <span className="font-medium text-emerald-600">
-              {completedProjectsRate}%
+              {completedProjectsRate.toFixed(1)}%
             </span>
 
             <span className="text-slate-400">of your projects</span>
@@ -150,7 +150,7 @@ function ManagerDashboard() {
             <Clock3 size={14} className="text-amber-500" />
 
             <span className="font-medium text-amber-600">
-              {taskStats.pendingTasks}
+              {taskStats.pendingTasks + taskStats.inProgressTasks}
             </span>
 
             <span className="text-slate-400">pending tasks</span>
@@ -179,7 +179,7 @@ function ManagerDashboard() {
             <TrendingUp size={14} className="text-emerald-500" />
 
             <span className="font-medium text-emerald-600">
-              {completedTasksRate}%
+              {completedTasksRate.toFixed(1)}%
             </span>
 
             <span className="text-slate-400">team completion</span>
@@ -229,8 +229,13 @@ function ManagerDashboard() {
 
           <div className="space-y-5 px-5 py-5">
             {projectProgress.length === 0 ? (
-              <div>
-                <p>No Recent Projects</p>
+              <div className="px-5 py-10 text-center">
+                <p className="text-sm font-medium text-slate-600">
+                  No projects yet
+                </p>
+                <p className="mt-1 text-xs text-slate-400">
+                  Project progress will appear here.
+                </p>
               </div>
             ) : (
               projectProgress.map((project) => (
@@ -284,8 +289,13 @@ function ManagerDashboard() {
 
           <div className="divide-y divide-slate-100">
             {projectProgress.length === 0 ? (
-              <div>
-                <p>No projects yet</p>
+              <div className="px-5 py-10 text-center">
+                <p className="text-sm font-medium text-slate-600">
+                  No projects yet
+                </p>
+                <p className="mt-1 text-xs text-slate-400">
+                  Your projects will appear here once created.
+                </p>
               </div>
             ) : (
               projectProgress.slice(0, 3).map((project) => (

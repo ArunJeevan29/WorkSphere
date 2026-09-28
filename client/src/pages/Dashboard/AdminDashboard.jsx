@@ -1,4 +1,4 @@
-import {
+﻿import {
   Users,
   FolderKanban,
   CheckSquare,
@@ -337,8 +337,9 @@ function AdminDashboard() {
           <div className="divide-y divide-slate-100">
             {/* Project 1 */}
             {recentProjects.length === 0 ? (
-              <div>
-                <p>No projects yet</p>
+              <div className="px-5 py-10 text-center">
+                <p className="text-sm font-medium text-slate-600">No projects yet</p>
+                <p className="mt-1 text-xs text-slate-400">Projects will appear here once they are created.</p>
               </div>
             ) : (
               recentProjects.map((project) => (
@@ -388,8 +389,9 @@ function AdminDashboard() {
           </div>
 
           {recentActivity.length === 0 ? (
-            <div>
-              <p>No Recent Activity</p>
+            <div className="px-5 py-10 text-center">
+              <p className="text-sm font-medium text-slate-600">No recent activity</p>
+              <p className="mt-1 text-xs text-slate-400">Activity will appear here as actions are taken.</p>
             </div>
           ) : (
             recentActivity.map((activity) => (
