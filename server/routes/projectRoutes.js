@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const router = express.Router();
 
 const authMiddleware = require("../middleware/authMiddleware");
@@ -10,6 +10,8 @@ const {
   addProjectMembersValidation,
   deleteProjectValidation,
   createTaskValidation,
+  fetchTaskValidation,
+  mongoIdValidation,
   validate,
 } = require("../middleware/validationMiddleware");
 
@@ -48,6 +50,8 @@ router.get(
   "/:id",
   authMiddleware,
   authorizationMiddleware(["admin", "manager"]),
+  mongoIdValidation,
+  validate,
   getProject,
 );
 // edit Project
@@ -55,16 +59,20 @@ router.put(
   "/:id",
   authMiddleware,
   authorizationMiddleware(["admin", "manager"]),
-  projectOwnershipMiddleware,
+  mongoIdValidation,
   updateProjectValidation,
   validate,
+  projectOwnershipMiddleware,
   updateProject,
 );
+
 // delete project
 router.delete(
   "/:id",
   authMiddleware,
   authorizationMiddleware(["admin", "manager"]),
+  mongoIdValidation,
+  validate,
   projectOwnershipMiddleware,
   deleteProject,
 );
@@ -75,27 +83,33 @@ router.get(
   "/:id/available-members",
   authMiddleware,
   authorizationMiddleware(["admin", "manager"]),
+  mongoIdValidation,
+  validate,
   projectOwnershipMiddleware,
   getAvailableProjectMembers,
 );
+
 // add project members
 router.patch(
   "/:id/members",
   authMiddleware,
   authorizationMiddleware(["admin", "manager"]),
-  projectOwnershipMiddleware,
+  mongoIdValidation,
   addProjectMembersValidation,
   validate,
+  projectOwnershipMiddleware,
   addProjectMember,
 );
+
 // delete project members
 router.delete(
   "/:id/members",
   authMiddleware,
   authorizationMiddleware(["admin", "manager"]),
-  projectOwnershipMiddleware,
+  mongoIdValidation,
   deleteProjectValidation,
   validate,
+  projectOwnershipMiddleware,
   removeProjectMembers,
 );
 
@@ -105,16 +119,21 @@ router.post(
   "/:id/tasks",
   authMiddleware,
   authorizationMiddleware(["admin", "manager"]),
-  projectOwnershipMiddleware,
+  mongoIdValidation,
   createTaskValidation,
   validate,
+  projectOwnershipMiddleware,
   createTask,
 );
+
 // get all tasks
 router.get(
   "/:id/tasks",
   authMiddleware,
   authorizationMiddleware(["admin", "manager"]),
+  mongoIdValidation,
+  fetchTaskValidation,
+  validate,
   projectOwnershipMiddleware,
   fetchAllTask,
 );

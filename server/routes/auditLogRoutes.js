@@ -1,8 +1,13 @@
-const express = require("express");
+﻿const express = require("express");
 const router = express.Router();
 
 const authMiddleware = require("../middleware/authMiddleware");
 const authorizationMiddleware = require("../middleware/authorizationMiddleware");
+
+const {
+  mongoIdValidation,
+  validate,
+} = require("../middleware/validationMiddleware");
 
 const {
   getAllLogs,
@@ -15,7 +20,9 @@ router.get(
   "/:id",
   authMiddleware,
   authorizationMiddleware(["admin", "manager"]),
+  mongoIdValidation,
+  validate,
   getAuditLogs,
-),
+);
 
 module.exports = router;

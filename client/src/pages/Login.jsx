@@ -187,6 +187,7 @@ function Login() {
             </div>
 
             {/* Password */}
+            {/* Password */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 Password
@@ -199,6 +200,17 @@ function Login() {
                 placeholder="Enter your password"
                 className="w-full border border-slate-300 bg-white rounded-lg px-4 py-3 text-sm text-slate-800 outline-none placeholder:text-slate-400 focus:border-violet-500 focus:ring-2 focus:ring-violet-100 transition"
               />
+            </div>
+
+            {/* Forgot Password */}
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => navigate("/forgot-password")}
+                className="text-sm font-medium text-violet-600 hover:text-violet-700 hover:underline cursor-pointer transition"
+              >
+                Forgot password?
+              </button>
             </div>
 
             {/* Sign In */}

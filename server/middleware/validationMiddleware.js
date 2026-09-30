@@ -1,4 +1,4 @@
-const { body, validationResult } = require("express-validator");
+﻿const { body, param, query, validationResult } = require("express-validator");
 
 const loginValidation = [
   body("email")
@@ -100,12 +100,16 @@ const addProjectMembersValidation = [
   body("members")
     .isArray({ min: 1 })
     .withMessage("Atleast one member is required"),
+
+  body("members.*").isMongoId().withMessage("Invalid Member ID"),
 ];
 
 const deleteProjectValidation = [
   body("members")
     .isArray({ min: 1 })
     .withMessage("Atleast one member is required"),
+
+  body("members.*").isMongoId().withMessage("Invalid Member ID"),
 ];
 
 const createTaskValidation = [
@@ -114,6 +118,7 @@ const createTaskValidation = [
   body("assignedTo")
     .isArray({ min: 1 })
     .withMessage("Atleast one member is required"),
+  body("assignedTo.*").isMongoId().withMessage("Invalid assigned user ID"),
   body("priority")
     .isIn(["low", "medium", "high"])
     .withMessage("Invalid priority level"),
@@ -131,6 +136,7 @@ const updateTaskValidation = [
   body("assignedTo")
     .isArray({ min: 1 })
     .withMessage("Atleast one member is required"),
+  body("assignedTo.*").isMongoId().withMessage("Invalid assigned user ID"),
   body("priority").isIn(["low", "medium", "high"]),
   body("dueDate")
     .trim()
@@ -167,6 +173,59 @@ const updateUserStatusValidation = [
     .withMessage("Invalid Status"),
 ];
 
+const forgotPasswordValidation = [
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("Email is Required")
+    .isEmail()
+    .withMessage("Enter a valid email"),
+];
+
+const resetpassword = [
+  body("password")
+    .notEmpty()
+    .withMessage("Password is required")
+    .isLength({ min: 6 })
+    .withMessage("Password must be minimum 6 characters"),
+
+  body("confirmPassword")
+    .notEmpty()
+    .withMessage("Password is required")
+    .isLength({ min: 6 })
+    .withMessage("Password must be minimum 6 characters"),
+];
+
+const mongoIdValidation = [param("id").isMongoId().withMessage("Invalid ID")];
+
+const fetchTaskValidation = [
+  query("page")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("Page must be a positive integer"),
+  query("limit")
+    .optional()
+    .isInt({ min: 1, max: 100 })
+    .withMessage("Limit must be between 1 and 100"),
+  query("status")
+    .optional()
+    .isIn(["pending", "in-progress", "completed"])
+    .withMessage("Invalid status"),
+  query("priority")
+    .optional()
+    .isIn(["low", "medium", "high"])
+    .withMessage("Invalid priority"),
+  query("sort")
+    .optional()
+    .isIn(["newest", "oldest", "due-asc", "due-desc"])
+    .withMessage("Invalid sort option"),
+  query("search")
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage("Search text is too long"),
+];
+
 const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -187,5 +246,9 @@ module.exports = {
   updateTaskStatusValidation,
   updateUserRoleValidation,
   updateUserStatusValidation,
+  forgotPasswordValidation,
+  resetpassword,
+  mongoIdValidation,
+  fetchTaskValidation,
   validate,
 };

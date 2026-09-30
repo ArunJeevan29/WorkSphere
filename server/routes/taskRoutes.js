@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const router = express.Router();
 
 const authMiddleware = require("../middleware/authMiddleware");
@@ -9,6 +9,7 @@ const taskManagementMiddleware = require("../middleware/taskManagementMiddleware
 const {
   updateTaskValidation,
   updateTaskStatusValidation,
+  mongoIdValidation,
   validate,
 } = require("../middleware/validationMiddleware");
 
@@ -18,7 +19,6 @@ const {
   updateTask,
   deleteTask,
   updateTaskStatus,
-  // getAllTasks,
 } = require("../controllers/taskController");
 
 router.get(
@@ -32,6 +32,8 @@ router.get(
   "/:id",
   authMiddleware,
   authorizationMiddleware(["admin", "manager", "member"]),
+  mongoIdValidation,
+  validate,
   taskAccessMiddleware,
   getTask,
 );
@@ -40,9 +42,10 @@ router.put(
   "/:id",
   authMiddleware,
   authorizationMiddleware(["admin", "manager"]),
-  taskManagementMiddleware,
+  mongoIdValidation,
   updateTaskValidation,
   validate,
+  taskManagementMiddleware,
   updateTask,
 );
 
@@ -50,6 +53,8 @@ router.delete(
   "/:id",
   authMiddleware,
   authorizationMiddleware(["admin", "manager"]),
+  mongoIdValidation,
+  validate,
   taskManagementMiddleware,
   deleteTask,
 );
@@ -58,9 +63,10 @@ router.patch(
   "/:id/status",
   authMiddleware,
   authorizationMiddleware(["admin", "manager", "member"]),
-  taskAccessMiddleware,
+  mongoIdValidation,
   updateTaskStatusValidation,
   validate,
+  taskAccessMiddleware,
   updateTaskStatus,
 );
 
