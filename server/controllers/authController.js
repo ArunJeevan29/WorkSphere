@@ -86,7 +86,7 @@ const loginUser = async (req, res, next) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       expires: expiryDate,
     });
 
@@ -159,7 +159,7 @@ const refreshAccessToken = async (req, res, next) => {
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       expires: newExpiryDate,
     });
 
@@ -216,7 +216,7 @@ const logoutUser = async (req, res, next) => {
     res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
 
     return res.status(200).json({ message: "Logout Successful" });
