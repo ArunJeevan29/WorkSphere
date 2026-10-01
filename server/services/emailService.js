@@ -1,21 +1,13 @@
-﻿const nodemailer = require("nodemailer");
+﻿const { Resend } = require("resend");
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_APP_PASSWORD,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendPasswordResetEmail = async (email, resetToken) => {
   const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
-  await transporter.sendMail({
-    from: `WorkSphere <${process.env.MAIL_USER}>`,
-    to: email,
+  const { data, error } = await resend.emails.send({
+    from: "WorkSphere <onboarding@resend.dev>",
+    to: [email],
     subject: "Reset Your WorkSphere Password",
 
     html: `
@@ -26,6 +18,7 @@ const sendPasswordResetEmail = async (email, resetToken) => {
             <h1 style="margin:0; color:#0f172a; font-size:24px;">
               WorkSphere
             </h1>
+
             <p style="margin:6px 0 0; color:#94a3b8; font-size:13px;">
               Access & Workspace Management
             </p>
@@ -69,7 +62,7 @@ const sendPasswordResetEmail = async (email, resetToken) => {
 
           <div style="border-top:1px solid #e2e8f0; margin-top:28px; padding-top:18px;">
             <p style="margin:0; color:#94a3b8; font-size:11px;">
-              WorkSphere Â· Role-based workspace management
+              WorkSphere · Role-based workspace management
             </p>
           </div>
 
@@ -77,7 +70,13 @@ const sendPasswordResetEmail = async (email, resetToken) => {
       </div>
     `,
   });
+
+  if (error) {
+    console.error("Resend email error:", error);
+    throw new Error(error.message);
+  }
+
+  console.log("Password reset email sent:", data.id);
 };
 
 module.exports = sendPasswordResetEmail;
-

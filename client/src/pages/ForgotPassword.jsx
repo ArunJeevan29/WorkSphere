@@ -12,9 +12,12 @@ function ForgotPassword() {
     e.preventDefault();
 
     if (loading) return;
+
     setLoading(true);
+
     try {
       const response = await forgotPassword({ email });
+
       toast.success(response.data.message);
       navigate("/login");
     } catch (error) {
@@ -28,6 +31,8 @@ function ForgotPassword() {
       } else {
         toast.error(error.message);
       }
+    } finally {
+      setLoading(false);
     }
   }
   return (
