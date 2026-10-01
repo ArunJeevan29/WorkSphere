@@ -1,7 +1,9 @@
-const nodemailer = require("nodemailer");
+﻿const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.MAIL_USER,
     pass: process.env.MAIL_APP_PASSWORD,
@@ -67,7 +69,7 @@ const sendPasswordResetEmail = async (email, resetToken) => {
 
           <div style="border-top:1px solid #e2e8f0; margin-top:28px; padding-top:18px;">
             <p style="margin:0; color:#94a3b8; font-size:11px;">
-              WorkSphere · Role-based workspace management
+              WorkSphere Â· Role-based workspace management
             </p>
           </div>
 
@@ -78,3 +80,4 @@ const sendPasswordResetEmail = async (email, resetToken) => {
 };
 
 module.exports = sendPasswordResetEmail;
+
