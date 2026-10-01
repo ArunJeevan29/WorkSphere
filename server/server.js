@@ -1,4 +1,4 @@
-require("dotenv").config();
+﻿require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -17,6 +17,7 @@ const auditLogRoutes = require("./routes/auditLogRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
+app.set('trust proxy', 1);
 
 app.use(
   cors({
@@ -51,3 +52,4 @@ const startServer = async () => {
 };
 
 startServer();
+
